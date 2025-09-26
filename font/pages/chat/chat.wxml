@@ -1,0 +1,191 @@
+<view class="chat-container">
+  <!-- 顶部导航栏 -->
+  <view class="chat-header">
+    <view class="header-center">
+      <view class="character-info" bindtap="onCharacterAvatarTap">
+        <view class="top-avatar-container">
+          <image 
+            src="{{characterAvatar}}" 
+            class="character-avatar {{isTopAvatarTall ? 'top-avatar-tall' : ''}}"
+            mode="{{isTopAvatarTall ? 'widthFix' : 'aspectFill'}}"
+            bindload="onTopAvatarLoad"
+          />
+        </view>
+        <view class="character-details">
+          <text class="character-name">{{characterName}}</text>
+        </view>
+      </view>
+      
+      <!-- 流式传输开关 -->
+      <view class="stream-toggle-container" bindtap="onStreamToggleTap">
+        <view class="stream-toggle {{streamEnabled ? 'stream-enabled' : 'stream-disabled'}}">
+          <view class="stream-toggle-slider"></view>
+        </view>
+        <text class="stream-toggle-text">{{streamEnabled ? '流式' : '普通'}}</text>
+      </view>
+      
+    </view>
+  </view>
+
+  <!-- 聊天消息区域 -->
+  <scroll-view 
+    class="chat-messages" 
+    scroll-y="true"
+    scroll-into-view="{{scrollToMessage}}"
+    scroll-with-animation="true"
+    enhanced="true"
+    show-scrollbar="false"
+    scroll-anchoring="true"
+    bounces="false"
+    bindscrolltoupper="onScrollToUpper"
+    bindscroll="onScroll"
+  >
+    <view class="messages-container">
+      <view 
+        class="message-item"
+        wx:for="{{messages}}"
+        wx:key="id"
+        id="msg-{{item.id}}"
+      >
+        <!-- AI消息 -->
+        <view class="message-ai" wx:if="{{item.role === 'ai'}}">
+          <view class="message-avatar">
+            <image src="{{characterAvatar}}" class="avatar-image {{isTopAvatarTall ? 'avatar-image-tall' : ''}}" mode="{{isTopAvatarTall ? 'widthFix' : 'aspectFill'}}" bindload="onAiAvatarLoad" />
+          </view>
+          <view class="message-content">
+            <view class="message-sender">
+              <text class="sender-name">{{characterName}}</text>
+            </view>
+            <view class="message-bubble {{item.isStreaming ? 'streaming' : ''}}" bindlongpress="onMessageLongPress" data-message="{{item.content}}" data-role="{{item.role}}" data-message-id="{{item.id}}">
+              <!-- 图片显示 -->
+              <view class="message-images" wx:if="{{item.images && item.images.length > 0}}">
+                <view class="image-grid {{item.images.length === 1 ? 'single' : item.images.length === 2 ? 'double' : 'multiple'}}">
+                  <image 
+                    wx:for="{{item.images}}" 
+                    wx:for-item="imageUrl"
+                    wx:key="index" 
+                    src="{{imageUrl}}" 
+                    class="message-image" 
+                    mode="aspectFill"
+                    bindtap="previewImage"
+                    data-current="{{imageUrl}}"
+                    data-urls="{{item.images}}"
+                  />
+                </view>
+              </view>
+              
+              <!-- 文本内容 -->
+              <text class="message-text" user-select="true" selectable="true" wx:if="{{item.content}}">{{item.content}}</text>
+              
+              <!-- 流式传输指示器 -->
+              <view class="streaming-indicator" wx:if="{{item.isStreaming}}">
+                <view class="typing-dots">
+                  <view class="typing-dot"></view>
+                  <view class="typing-dot"></view>
+                  <view class="typing-dot"></view>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+        
+        <!-- 用户消息 -->
+        <view class="message-user" wx:if="{{item.role === 'user'}}">
+          <view class="message-content">
+            <view class="message-sender">
+              <text class="sender-name">{{userInfo.nickname || '用户'}}</text>
+            </view>
+            <view class="message-bubble" bindlongpress="onMessageLongPress" data-message="{{item.content}}" data-role="{{item.role}}" data-message-id="{{item.id}}">
+              <!-- 图片显示 -->
+              <view class="message-images" wx:if="{{item.images && item.images.length > 0}}">
+                <view class="image-grid {{item.images.length === 1 ? 'single' : item.images.length === 2 ? 'double' : 'multiple'}}">
+                  <image 
+                    wx:for="{{item.images}}" 
+                    wx:for-item="imageUrl"
+                    wx:key="index" 
+                    src="{{imageUrl}}" 
+                    class="message-image" 
+                    mode="aspectFill"
+                    bindtap="previewImage"
+                    data-current="{{imageUrl}}"
+                    data-urls="{{item.images}}"
+                  />
+                </view>
+              </view>
+              
+              <!-- 文本内容 -->
+              <text class="message-text" user-select="true" selectable="true" wx:if="{{item.content}}">{{item.content}}</text>
+            </view>
+          </view>
+          <view class="message-avatar">
+            <image 
+              wx:if="{{userInfo && userInfo.avatar}}" 
+              src="{{userInfo.avatar}}" 
+              class="avatar-image"
+              mode="aspectFill"
+            />
+            <view wx:else class="avatar-image default-avatar">
+              <text class="avatar-text">{{userInfo ? (userInfo.nickname ? userInfo.nickname[0] : '用') : '用'}}</text>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 加载状态 -->
+      <view class="loading-message" wx:if="{{loading}}">
+        <text>{{characterName}}正在思考中</text>
+        <view class="loading-dots">
+          <view class="loading-dot"></view>
+          <view class="loading-dot"></view>
+          <view class="loading-dot"></view>
+        </view>
+      </view>
+    </view>
+  </scroll-view>
+
+  <!-- 输入区域 - 固定在底部 -->
+  <view class="chat-input-container">
+    <view class="chat-input">
+      <!-- 图片预览区域 -->
+      <view class="image-preview-container" wx:if="{{selectedImages.length > 0}}">
+        <scroll-view class="image-preview-scroll" scroll-x="true">
+          <view class="image-preview-list">
+            <view class="image-preview-item" wx:for="{{selectedImages}}" wx:key="index">
+              <image src="{{item}}" class="preview-image" mode="aspectFill" />
+              <view class="remove-image-btn" bindtap="removeImage" data-index="{{index}}">×</view>
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+      
+      <view class="input-container">
+        <view class="image-btn" bindtap="selectImages">
+          <text class="image-icon">➕</text>
+        </view>
+        
+        <textarea 
+          class="message-textarea {{selectedImages.length > 0 ? 'with-images' : ''}}"
+          placeholder="输入消息..."
+          value="{{inputMessage}}"
+          bindinput="onInputChange"
+          bindconfirm="sendMessage"
+          bindfocus="onInputFocus"
+          bindblur="onInputBlur"
+          bindlongpress="onInputLongPress"
+          confirm-type="send"
+          maxlength="500"
+          show-confirm-bar="false"
+          cursor-spacing="20"
+          fixed="true"
+          auto-height="true"
+          hold-keyboard="true"
+          disabled="{{isStreaming}}"
+          adjust-position="false"
+        />
+        <view class="send-btn {{(inputMessage || selectedImages.length > 0) && !isStreaming ? 'send-active' : ''}}" bindtap="sendMessage">
+            <text class="send-text">发送</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view> 

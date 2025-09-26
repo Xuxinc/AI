@@ -1,0 +1,347 @@
+.conversations-container {
+  min-height: 100vh;
+  background: #f5f5f5;
+  padding-bottom: 40rpx;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 顶部标题 */
+.header {
+  background: white;
+  padding: 30rpx;
+  text-align: center;
+  border-bottom: 1rpx solid #e0e0e0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 会话列表 */
+.conversations-list {
+  padding: 20rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.conversation-item {
+  position: relative;
+  margin-bottom: 20rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+  height: auto;
+  min-height: auto;
+  width: 100%;
+}
+
+.conversation-item.pinned {
+  background: #f8f9ff;
+  border-left: 6rpx solid #a29bfe;
+  box-sizing: border-box;
+  /* 确保置顶会话不会变大，保持与普通会话相同的大小 */
+  height: auto;
+  min-height: auto;
+  width: 100%;
+}
+
+.conversation-main {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  background: white;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  z-index: 2;
+  transform: translateX(0);
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.conversation-main:active {
+  background: #f8f9fa;
+}
+
+.conversation-main.swiped {
+  transform: translateX(-240rpx);
+}
+
+
+
+.conversation-avatar {
+  width: 100rpx;
+  height: 100rpx;
+  border-radius: 50rpx;
+  overflow: hidden;
+  margin-right: 24rpx;
+  flex-shrink: 0;
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+}
+
+/* 会话头像为长图时：顶部对齐并按宽度自适应高度 */
+.avatar-image-tall {
+  height: auto;
+  object-position: top;
+  display: block;
+}
+
+.conversation-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.conversation-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.name-pin-container {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+
+
+.character-name {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+.pin-icon {
+  font-size: 24rpx;
+  color: #007aff;
+}
+
+.conversation-time {
+  font-size: 24rpx;
+  color: #999;
+}
+
+.conversation-preview {
+  display: flex;
+  align-items: center;
+}
+
+.last-message {
+  font-size: 28rpx;
+  color: #666;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.conversation-arrow {
+  margin-left: 16rpx;
+  color: #ccc;
+}
+
+.arrow-icon {
+  font-size: 32rpx;
+}
+
+/* 空状态 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx 40rpx;
+  text-align: center;
+}
+
+.empty-image {
+  width: 200rpx;
+  height: 200rpx;
+  margin-bottom: 40rpx;
+  opacity: 0.5;
+}
+
+.empty-text {
+  font-size: 32rpx;
+  color: #666;
+  margin-bottom: 16rpx;
+}
+
+.empty-desc {
+  font-size: 28rpx;
+  color: #999;
+}
+
+/* 加载状态 */
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60rpx;
+}
+
+.loading-text {
+  font-size: 28rpx;
+  color: #666;
+}
+
+/* 下拉刷新提示 */
+.refresh-tip {
+  text-align: center;
+  padding: 20rpx;
+  color: #999;
+  font-size: 24rpx;
+}
+
+/* 左滑操作区域 */
+.swipe-actions {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  z-index: 1;
+  width: 240rpx;
+  box-sizing: border-box;
+}
+
+.action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 120rpx;
+  height: 100%;
+  color: white;
+  font-size: 26rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.action-btn:active {
+  opacity: 0.9;
+  transform: scale(0.98);
+  box-shadow: inset 0 2rpx 8rpx rgba(0, 0, 0, 0.15);
+}
+
+.pin-btn {
+  background: linear-gradient(135deg, #a29bfe 0%, #6c5ce7 100%);
+}
+
+.delete-btn {
+  background: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+}
+
+.action-icon {
+  font-size: 40rpx;
+  margin-bottom: 12rpx;
+}
+
+.action-text {
+  font-size: 24rpx;
+  font-weight: 500;
+}
+
+/* iOS系统特殊适配 */
+@supports (-webkit-touch-callout: none) {
+  .conversations-container {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  .header {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .conversations-list {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .conversation-item {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .conversation-main {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* Android系统特殊适配 */
+@supports not (-webkit-touch-callout: none) {
+  .conversations-container {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .header {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .conversations-list {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .conversation-item {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .conversation-main {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+/* 响应式适配 */
+@media screen and (max-width: 750rpx) {
+  .conversations-container {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .header {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .conversations-list {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .conversation-item {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .conversation-main {
+    width: 100%;
+    max-width: 100%;
+  }
+} 

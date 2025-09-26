@@ -1,0 +1,111 @@
+<view class="character-detail-container" wx:if="{{character}}">
+  <!-- 角色头像和基本信息 -->
+  <view class="character-header">
+    <view class="avatar-section">
+      <view class="detail-avatar-container">
+        <image 
+          src="{{character.avatar_url}}" 
+          class="character-avatar {{isAvatarTall ? 'detail-avatar-tall' : ''}}"
+          mode="{{isAvatarTall ? 'widthFix' : 'aspectFill'}}"
+          bindtap="previewAvatar"
+          bindload="onDetailAvatarLoad"
+        />
+      </view>
+      <view class="avatar-overlay">
+        <text class="preview-text">点击预览</text>
+      </view>
+    </view>
+    
+    <view class="character-info">
+      <text class="character-name">{{character.name}}</text>
+      <text class="character-description">{{character.description}}</text>
+    </view>
+  </view>
+  
+  <!-- 角色详细信息 -->
+  <view class="character-details">
+    <!-- 提示词 -->
+    <view class="detail-section">
+      <view class="section-header">
+        <text class="section-title">角色提示词</text>
+        <view class="edit-button" bindtap="toggleEdit" wx:if="{{!isEditing}}">
+          <text class="edit-text">编辑</text>
+        </view>
+      </view>
+      
+      <view class="section-content">
+        <textarea 
+          wx:if="{{isEditing}}"
+          class="prompt-textarea"
+          value="{{editPrompt}}"
+          placeholder="请输入角色提示词..."
+          bindinput="onPromptInput"
+          maxlength="500"
+          auto-height
+        />
+        <text wx:else class="prompt-text">{{character.prompt}}</text>
+      </view>
+    </view>
+    
+    <!-- 音色模型 -->
+    <view class="detail-section">
+      <view class="section-header">
+        <text class="section-title">音色模型</text>
+        <view class="upload-voice-button" bindtap="uploadVoice" wx:if="{{isEditing}}">
+          <text class="upload-voice-text">上传音色</text>
+        </view>
+      </view>
+      
+      <!-- 录音要求提示 -->
+      <view class="voice-requirements" wx:if="{{isEditing}}">
+        <text class="requirements-text">📝 录音要求：10-20秒，清晰发音，避免噪音，支持mp3、wav、m4a格式</text>
+      </view>
+      
+      <view class="section-content">
+        <picker 
+          wx:if="{{isEditing}}"
+          mode="selector"
+          range="{{voiceModelOptions}}"
+          range-key="label"
+          value="{{selectedVoiceModelIndex}}"
+          bindchange="onVoiceModelChange"
+        >
+          <view class="picker-container">
+            <text class="picker-text">{{selectedVoiceModelLabel}}</text>
+            <text class="picker-arrow">▼</text>
+          </view>
+        </picker>
+        <text wx:else class="voice-model-text">{{currentVoiceModelLabel}}</text>
+      </view>
+    </view>
+    
+    <!-- 创建信息 -->
+    <view class="detail-section">
+      <view class="section-header">
+        <text class="section-title">创建信息</text>
+      </view>
+      
+      <view class="section-content">
+        <view class="info-item">
+          <text class="info-label">创建时间：</text>
+          <text class="info-value">{{formattedCreatedAt}}</text>
+        </view>
+        <view class="info-item">
+          <text class="info-label">修改时间：</text>
+          <text class="info-value">{{formattedUpdatedAt}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 编辑操作按钮 -->
+  <view class="edit-actions" wx:if="{{isEditing}}">
+    <button class="cancel-button" bindtap="cancelEdit">取消</button>
+    <button class="save-button" bindtap="saveChanges">保存</button>
+  </view>
+</view>
+
+<!-- 加载中提示 -->
+<view class="loading-container" wx:if="{{!character}}">
+  <view class="loading-text">加载中...</view>
+</view> 

@@ -1,0 +1,228 @@
+<view class="container">
+  <!-- 顶部标题区域 -->
+  <view class="header-section">
+    <view class="user-avatar" bindtap="onAvatarTap" hover-class="user-avatar-hover" hover-stay-time="100">
+      <!-- 用户头像 -->
+      <image 
+        wx:if="{{userInfo && userInfo.avatar}}" 
+        src="{{userInfo.avatar}}" 
+        class="avatar-image"
+        mode="aspectFill"
+      />
+      <!-- 默认头像 -->
+      <view wx:elif="{{userInfo}}" class="avatar-image default-avatar">
+        <text class="avatar-text">{{userInfo.nickname ? userInfo.nickname[0] : '用'}}</text>
+      </view>
+      <!-- 登录覆盖层 -->
+      <view class="avatar-overlay" wx:if="{{!userInfo}}">
+        <text class="login-text">点击登录</text>
+      </view>
+    </view>
+    
+    <view class="title-section">
+      <text class="main-title">AI名人堂</text>
+      <text class="sub-title">与历史名人对话，探索智慧人生</text>
+    </view>
+    
+    <!-- 右侧按钮区域 -->
+    <view class="action-buttons">
+      <view class="action-btn" bindtap="onSearchTap" hover-class="action-btn-hover">
+        <image src="/images/search.jpeg" class="action-icon" mode="aspectFit" />
+      </view>
+      <view class="action-btn" bindtap="onAddTap" hover-class="action-btn-hover">
+        <image src="/images/add.jpeg" class="action-icon" mode="aspectFit" />
+      </view>
+    </view>
+  </view>
+
+  <!-- 分类Tabs -->
+  <view class="category-tabs">
+    <view 
+      wx:for="{{categories}}" 
+      wx:key="key" 
+      class="category-tab {{activeCategory === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}"
+      bindtap="onCategoryTap"
+    >
+      <text class="category-text">{{item.label}}</text>
+    </view>
+  </view>
+
+  <!-- 名人列表区域 -->
+  <scroll-view 
+    class="characters-scroll" 
+    scroll-y="true" 
+    enable-back-to-top="true"
+    enablePullDownRefresh="true"
+    bindscrolltolower="onScrollToLower"
+  >
+    <view class="characters-grid">
+      <view 
+        class="character-card" 
+        wx:for="{{characters}}" 
+        wx:key="id"
+        bindtap="onCharacterTap"
+        bindlongpress="onCharacterLongPress"
+        data-character="{{item}}"
+        hover-class="character-card-hover"
+        hover-stay-time="100"
+      >
+        <view class="character-avatar-container">
+          <image 
+            src="{{item.avatar_url}}" 
+            class="character-avatar {{item.isTall ? 'character-avatar-tall' : ''}}"
+            mode="{{item.isTall ? 'widthFix' : 'aspectFill'}}"
+            data-index="{{index}}"
+            data-url="{{item.avatar_url}}"
+            bindload="onCharacterImageLoad"
+          />
+        </view>
+        <view class="character-info">
+          <text class="character-name">{{item.name}}</text>
+          <text class="character-desc">{{item.description}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 加载状态 -->
+    <view class="loading-state" wx:if="{{loading}}">
+      <text class="loading-text">加载中...</text>
+    </view>
+    
+    <!-- 没有更多数据提示 -->
+    <view class="no-more-state" wx:if="{{!hasMore && characters.length > 0}}">
+      <text class="no-more-text">已经到底啦 ~</text>
+    </view>
+    
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{characters.length === 0 && !loading}}">
+      <text class="empty-text">暂无名人数据</text>
+    </view>
+  </scroll-view>
+
+  <!-- 登录弹窗 -->
+  <view class="login-modal" wx:if="{{showLoginModal}}">
+    <view class="modal-content">
+      <view class="modal-title">需要登录</view>
+      <view class="modal-desc">请先登录后再开始对话</view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideLoginModal" hover-class="btn-cancel-hover">取消</button>
+        <button class="btn-login" bindtap="handleLogin" hover-class="btn-login-hover">立即登录</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索弹窗 -->
+  <view class="search-modal" wx:if="{{showSearchModal}}">
+    <view class="modal-content">
+      <view class="modal-title">搜索名人</view>
+      <view class="modal-input-section">
+        <input 
+          class="modal-input" 
+          placeholder="请输入名人姓名" 
+          value="{{searchName}}"
+          bindinput="onSearchInput"
+          focus="{{showSearchModal}}"
+        />
+      </view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideSearchModal" hover-class="btn-cancel-hover">取消</button>
+        <button class="btn-confirm" bindtap="handleSearch" hover-class="btn-confirm-hover">搜索</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增角色弹窗 -->
+  <view class="add-modal" wx:if="{{showAddModal}}">
+    <view class="modal-content">
+      <view class="modal-title">新增角色</view>
+      <view class="modal-options">
+        <view class="option-item" bindtap="onAddCelebrityTap" hover-class="option-item-hover">
+          <text class="option-title">新增名人</text>
+          <text class="option-desc">输入名人姓名，AI自动生成角色信息</text>
+        </view>
+        <view class="option-item" bindtap="onAddCustomTap" hover-class="option-item-hover">
+          <text class="option-title">自定义角色</text>
+          <text class="option-desc">创建完全自定义的角色</text>
+        </view>
+      </view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideAddModal" hover-class="btn-cancel-hover">取消</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 新增名人弹窗 -->
+  <view class="add-celebrity-modal" wx:if="{{showAddCelebrityModal}}">
+    <view class="modal-content">
+      <view class="modal-title">新增名人</view>
+      <view class="modal-input-section">
+        <input 
+          class="modal-input" 
+          placeholder="请输入名人姓名" 
+          value="{{newCelebrityName}}"
+          bindinput="onNewCelebrityInput"
+          focus="{{showAddCelebrityModal}}"
+        />
+      </view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideAddCelebrityModal" hover-class="btn-cancel-hover">取消</button>
+        <button class="btn-confirm" bindtap="handleAddCelebrity" hover-class="btn-confirm-hover">生成</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 自定义角色弹窗 -->
+  <view class="add-custom-modal" wx:if="{{showAddCustomModal}}">
+    <view class="modal-content">
+      <view class="modal-title">自定义角色</view>
+      <view class="modal-input-section">
+        <input 
+          class="modal-input" 
+          placeholder="角色姓名" 
+          value="{{newCustomName}}"
+          bindinput="onNewCustomNameInput"
+        />
+        <textarea 
+          class="modal-textarea" 
+          placeholder="角色描述（性格、背景、特点等）" 
+          value="{{newCustomDescription}}"
+          bindinput="onNewCustomDescriptionInput"
+          maxlength="500"
+        />
+        <view class="avatar-upload-section">
+          <button class="btn-upload-avatar" bindtap="onChooseCustomAvatar">上传头像</button>
+          <image wx:if="{{newCustomAvatar}}" src="{{newCustomAvatar}}" class="avatar-preview" mode="aspectFill" />
+        </view>
+      </view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideAddCustomModal" hover-class="btn-cancel-hover">取消</button>
+        <button class="btn-confirm" bindtap="handleAddCustom" hover-class="btn-confirm-hover">创建</button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索结果弹窗 -->
+  <view class="search-result-modal" wx:if="{{showSearchResultModal}}">
+    <view class="modal-content">
+      <view class="modal-title">{{searchResult.exists ? '找到角色' : '角色不存在'}}</view>
+      <view class="modal-result-content">
+        <text class="result-text">{{searchResult.message}}</text>
+        <view wx:if="{{searchResult.exists}}" class="result-character">
+          <view class="result-avatar-container">
+            <image src="{{searchResult.character.avatar_url}}" class="result-avatar {{resultAvatarTall ? 'result-avatar-tall' : ''}}" mode="{{resultAvatarTall ? 'widthFix' : 'aspectFill'}}" bindload="onResultAvatarLoad" data-url="{{searchResult.character.avatar_url}}" />
+          </view>
+          <view class="result-info">
+            <text class="result-name">{{searchResult.character.name}}</text>
+            <text class="result-desc">{{searchResult.character.description}}</text>
+          </view>
+        </view>
+      </view>
+      <view class="modal-buttons">
+        <button class="btn-cancel" bindtap="hideSearchResultModal" hover-class="btn-cancel-hover">关闭</button>
+        <button wx:if="{{!searchResult.exists}}" class="btn-confirm" bindtap="handleCreateFromSearch" hover-class="btn-confirm-hover">创建角色</button>
+        <button wx:if="{{searchResult.exists}}" class="btn-confirm" bindtap="handleGoToChat" hover-class="btn-confirm-hover">开始对话</button>
+      </view>
+    </view>
+  </view>
+</view> 

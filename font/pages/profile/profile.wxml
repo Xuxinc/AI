@@ -1,0 +1,98 @@
+<view class="container">
+  <!-- 顶部导航 -->
+  <view class="nav-bar">
+    <view class="nav-title">个人资料</view>
+  </view>
+
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading">
+    <text>加载中...</text>
+  </view>
+
+  <!-- 用户信息 -->
+  <view wx:else class="profile-content">
+    <!-- 头像区域 -->
+    <view class="avatar-section">
+      <view class="avatar-container">
+        <image 
+          wx:if="{{avatar || (userInfo && userInfo.avatar)}}" 
+          src="{{avatar || userInfo.avatar}}" 
+          class="avatar-image"
+          mode="aspectFill"
+          binderror="onImageError"
+          bindload="onImageLoad"
+        />
+        <view wx:else class="avatar-image default-avatar">
+          <text class="avatar-text">{{userInfo ? (userInfo.nickname ? userInfo.nickname[0] : '用') : '用'}}</text>
+        </view>
+        
+        <!-- 编辑状态下的头像选择按钮 -->
+        <view wx:if="{{editing && canIUseChooseAvatar}}" class="avatar-overlay" style="opacity: 1;">
+          <button class="avatar-select-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <text>更换头像</text>
+          </button>
+        </view>
+        
+        <!-- 编辑状态下的点击提示 -->
+        <view wx:if="{{editing && !canIUseChooseAvatar}}" class="avatar-edit-hint">
+          <text>点击更换头像</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 用户信息表单 -->
+    <view class="info-form">
+      <!-- 昵称 -->
+      <view class="form-item">
+        <text class="form-label">昵称</text>
+        <view wx:if="{{editing}}" class="nickname-wrapper">
+          <input 
+            wx:if="{{canIUseNicknameComp}}"
+            type="nickname" 
+            class="form-input"
+            value="{{nickname}}"
+            placeholder="请输入昵称"
+            bindchange="onNicknameInput"
+          />
+          <input 
+            wx:else
+            class="form-input"
+            value="{{nickname}}"
+            placeholder="请输入昵称"
+            bindinput="onNicknameInput"
+          />
+        </view>
+        <text wx:else class="form-value">{{userInfo.nickname || '未设置'}}</text>
+      </view>
+
+      <!-- 注册时间 -->
+      <view class="form-item">
+        <text class="form-label">注册时间</text>
+        <text class="form-value">{{userInfo.created_at}}</text>
+      </view>
+    </view>
+
+    <!-- 按钮区域 -->
+    <view class="button-section">
+      <!-- 编辑状态下的按钮 -->
+      <view wx:if="{{editing}}" class="edit-actions">
+        <button class="btn-cancel" bindtap="cancelEdit" disabled="{{loading}}">
+          取消
+        </button>
+        <button class="btn-save" bindtap="saveEdit" loading="{{loading}}" disabled="{{loading}}">
+          保存
+        </button>
+      </view>
+
+      <!-- 非编辑状态下的按钮 -->
+      <view wx:if="{{!editing}}" class="action-actions">
+        <button class="btn-edit" bindtap="startEdit">
+          编辑资料
+        </button>
+        <button class="btn-logout" bindtap="logout">
+          退出登录
+        </button>
+      </view>
+    </view>
+  </view>
+</view> 
