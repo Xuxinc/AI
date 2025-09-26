@@ -1,0 +1,111 @@
+/* 全局样式 */
+
+/* 基础兼容性设置 */
+page {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* 安全区域适配 */
+.safe-area-top {
+  padding-top: env(safe-area-inset-top);
+}
+
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+.safe-area-left {
+  padding-left: env(safe-area-inset-left);
+}
+
+.safe-area-right {
+  padding-right: env(safe-area-inset-right);
+}
+
+/* 容器基础样式 */
+.container {
+  width: 100%;
+  min-height: 100vh;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+/* 全局box-sizing设置 */
+view, text, image, button, input, textarea, scroll-view, swiper, navigator {
+  box-sizing: border-box;
+}
+
+/* tabBar美化 */
+/* 仅对tabBar文字和图片做美化，保证兼容微信原生tabBar */
+
+.weui-tabbar__label, .wx-tabbar__label, .tabbar-label {
+  font-size: 34rpx !important;
+  font-weight: 500;
+  margin-top: 8rpx;
+}
+
+.weui-tabbar__item.selected .weui-tabbar__label,
+.wx-tabbar__item.selected .wx-tabbar__label,
+.tabbar-label.selected {
+  color: #007AFF !important;
+  font-weight: bold;
+}
+
+.weui-tabbar__item .weui-tabbar__label,
+.wx-tabbar__item .wx-tabbar__label,
+.tabbar-label {
+  color: #999999 !important;
+}
+
+/* 让tabBar图片更圆润美观 */
+.weui-tabbar__icon image,
+.wx-tabbar__icon image {
+  border-radius: 16rpx;
+  width: 60rpx;
+  height: 60rpx;
+}
+
+/* iOS系统特殊适配 */
+@supports (-webkit-touch-callout: none) {
+  .container {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  /* iOS安全区域适配 */
+  .safe-area-container {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Android系统特殊适配 */
+@supports not (-webkit-touch-callout: none) {
+  .container {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+}
+
+/* 通用响应式适配 */
+@media screen and (max-width: 750rpx) {
+  .container {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+}
+
+/* 确保所有页面容器都不会超出屏幕宽度 */
+page {
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+} 

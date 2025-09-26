@@ -1,0 +1,77 @@
+<view class="conversations-container">
+  <!-- 顶部标题 -->
+  <view class="header">
+    <text class="title">历史会话</text>
+  </view>
+
+  <!-- 会话列表 -->
+  <view class="conversations-list" bindtap="onTapOutside">
+    <view 
+      class="conversation-item {{item.is_top === 'yes' ? 'pinned' : ''}}" 
+      wx:for="{{conversations}}" 
+      wx:key="character_id"
+      data-conversation="{{item}}"
+      data-index="{{index}}"
+      bindtouchstart="onTouchStart"
+      bindtouchmove="onTouchMove"
+      bindtouchend="onTouchEnd"
+    >
+      <!-- 主要内容区域 -->
+      <view class="conversation-main {{swipedIndex === index ? 'swiped' : ''}}" bindtap="onConversationTap" data-conversation="{{item}}">
+        <view class="conversation-avatar">
+          <image 
+            src="{{item.character_avatar}}" 
+            class="avatar-image {{item.isTall ? 'avatar-image-tall' : ''}}"
+            mode="{{item.isTall ? 'widthFix' : 'aspectFill'}}"
+            data-index="{{index}}"
+            data-url="{{item.character_avatar}}"
+            bindload="onConversationAvatarLoad"
+          />
+        </view>
+        <view class="conversation-content">
+          <view class="conversation-header">
+            <view class="name-pin-container">
+              <text class="character-name">{{item.character_name}}</text>
+              <text class="pin-icon" wx:if="{{item.is_top === 'yes'}}">📌</text>
+            </view>
+            <text class="conversation-time">{{item.last_time}}</text>
+          </view>
+          <view class="conversation-preview">
+            <text class="last-message">{{item.last_message}}</text>
+          </view>
+        </view>
+        <view class="conversation-arrow">
+          <text class="arrow-icon">></text>
+        </view>
+      </view>
+      
+      <!-- 左滑操作区域 -->
+      <view class="swipe-actions">
+        <view class="action-btn pin-btn" bindtap="onPinConversation" data-index="{{index}}">
+          <text class="action-icon">{{item.is_top === 'yes' ? '📍' : '📌'}}</text>
+          <text class="action-text">{{item.is_top === 'yes' ? '取消置顶' : '置顶'}}</text>
+        </view>
+        <view class="action-btn delete-btn" bindtap="onDeleteConversation" data-index="{{index}}">
+          <text class="action-icon">🗑️</text>
+          <text class="action-text">删除</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{conversations.length === 0}}">
+    <text class="empty-text">暂无历史会话</text>
+    <text class="empty-desc">去首页选择名人开始对话吧</text>
+  </view>
+
+  <!-- 加载状态 -->
+  <view class="loading" wx:if="{{loading}}">
+    <text class="loading-text">加载中...</text>
+  </view>
+
+  <!-- 下拉刷新提示 -->
+  <view class="refresh-tip" wx:if="{{conversations.length > 0}}">
+    <text>下拉刷新获取最新会话</text>
+  </view>
+</view> 

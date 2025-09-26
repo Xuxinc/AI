@@ -1,0 +1,1186 @@
+.chat-container {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+/* 固定背景 */
+.chat-container::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  z-index: -1;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+/* 顶部导航栏 */
+.chat-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx 30rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.2);
+  height: 100rpx;
+  box-sizing: border-box;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  width: 100vw;
+  max-width: 100vw;
+}
+
+.header-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.character-info {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+}
+
+.character-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  border: 2rpx solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.character-details {
+  display: flex;
+  align-items: center;
+}
+
+.character-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+}
+
+/* 聊天消息区域 */
+.chat-messages {
+  flex: 1;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(5px);
+  overflow: hidden;
+  height: calc(100vh - 240rpx - env(safe-area-inset-bottom)); /* 减去头部和底部的高度以及安全区域 */
+  margin-top: 100rpx; /* 为固定的顶部导航栏留出空间 */
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+}
+
+.messages-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+  padding-bottom: 20rpx;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-item {
+  display: flex;
+  flex-direction: column;
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* AI消息样式 */
+.message-ai {
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  max-width: 100%;
+  padding-left: 0rpx; /* 减小左边距20rpx */
+  padding-right: 20rpx; /* 右边距 */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-avatar {
+  position: relative;
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+  z-index: 1;
+  margin-left: 0; /* 确保AI头像紧贴左边界 */
+}
+
+.avatar-image {
+  width: 100%;
+  height: 100%;
+}
+
+.default-avatar {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-text {
+  color: white;
+  font-size: 24rpx;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.message-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: calc(100vw - 140rpx);
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-sender {
+  margin-bottom: 8rpx;
+}
+
+.sender-name {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 200rpx;
+}
+
+.message-bubble {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-radius: 24rpx;
+  padding: 20rpx;
+  box-shadow: 0 8rpx 24rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+  border: 1rpx solid rgba(255, 255, 255, 0.2);
+  max-width: 75vw; 
+  width: fit-content; 
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  transition: width 0.3s ease;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* 新增：消息气泡长按状态样式 */
+.message-bubble:active {
+  transform: scale(0.98); /* 轻微缩放效果 */
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.15); /* 增强阴影效果 */
+}
+
+/* 流式传输中的气泡样式 */
+.message-bubble.streaming {
+  width: fit-content; /* 根据内容自适应宽度 */
+}
+
+.message-bubble::before {
+  content: '';
+  position: absolute;
+  left: -8rpx;
+  top: 20rpx;
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-right: 8rpx solid rgba(255, 255, 255, 0.95);
+}
+
+.message-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: normal;
+  word-break: normal;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  user-select: text;
+  -webkit-user-select: text;
+  min-width: 0; /* 允许文本收缩 */
+  display: inline-block; /* 新增：确保文本正确换行 */
+  max-width: 100%; /* 新增：确保文本不会超出容器 */
+  box-sizing: border-box; /* 新增：确保尺寸计算正确 */
+  word-wrap: break-word; /* 新增：确保长单词也能换行 */
+}
+
+/* 新增：消息中的图片显示 */
+.message-images {
+  margin-bottom: 12rpx;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.image-grid.single {
+  max-width: 400rpx;
+}
+
+.image-grid.single .message-image {
+  width: 100%;
+  max-height: 400rpx;
+  border-radius: 16rpx;
+  object-fit: cover;
+}
+
+.image-grid.double {
+  max-width: 400rpx;
+}
+
+.image-grid.double .message-image {
+  width: calc(50% - 4rpx);
+  height: 200rpx;
+  border-radius: 12rpx;
+  object-fit: cover;
+}
+
+/* 多张图片的响应式布局 */
+.image-grid.multiple {
+  max-width: 400rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列网格 */
+  gap: 8rpx;
+  width: 100%;
+}
+
+.image-grid.multiple .message-image {
+  width: 100%;
+  height: 120rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  display: block; /* 确保图片正确显示 */
+}
+
+/* 用户消息中的多张图片 */
+.message-user .image-grid.multiple {
+  max-width: 400rpx;
+  width: 400rpx; /* 多张图片固定宽度 */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列网格 */
+  gap: 8rpx;
+}
+
+.message-user .image-grid.multiple .message-image {
+  width: 100%;
+  height: 120rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  display: block; /* 确保图片正确显示 */
+}
+
+.message-image {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  object-fit: cover;
+}
+
+.message-image:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+}
+
+/* 新增：确保有图片时文本内容的间距 */
+.message-text {
+  font-size: 28rpx;
+  color: #333;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%; /* 确保文本不会超出气泡 */
+  user-select: text;
+  -webkit-user-select: text;
+  line-height: 1.5;
+  font-size: 28rpx;
+  min-width: 0; /* 新增：允许文本收缩 */
+  display: inline-block; /* 新增：确保文本正确换行 */
+  word-wrap: break-word; /* 新增：确保长单词也能换行 */
+}
+
+.message-actions {
+  margin-top: 12rpx;
+  padding-top: 12rpx;
+  border-top: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+
+.action-btn {
+  font-size: 24rpx;
+  color: #007AFF;
+  padding: 8rpx 16rpx;
+  background: rgba(0, 122, 255, 0.1);
+  border-radius: 12rpx;
+}
+
+/* 用户消息样式 */
+.message-user {
+  display: flex;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 16rpx;
+  max-width: 100%;
+  padding-left: 20rpx; /* 左边距 */
+  padding-right: 0rpx; 
+  margin-left: auto; /* 确保用户消息靠右对齐 */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-user .message-content {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  max-width: calc(100vw - 140rpx); /* 与AI消息保持一致的宽度计算 */
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.message-user .message-sender {
+  text-align: right;
+  margin-bottom: 8rpx;
+}
+
+.message-user .message-bubble {
+  background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%);
+  color: white;
+  border: none;
+  max-width: 75vw; 
+  width: fit-content; 
+  padding: 16rpx 20rpx;
+  border-radius: 24rpx;
+  position: relative;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+}
+
+/* 新增：用户消息气泡长按状态样式 */
+.message-user .message-bubble:active {
+  transform: scale(0.98); /* 轻微缩放效果 */
+  box-shadow: 0 4rpx 16rpx rgba(0, 122, 255, 0.4); /* 增强阴影效果 */
+}
+
+.message-user .message-bubble::before {
+  display: none;
+}
+
+.message-user .message-bubble::after {
+  content: '';
+  position: absolute;
+  right: -8rpx;
+  top: 20rpx;
+  width: 0;
+  height: 0;
+  border-top: 8rpx solid transparent;
+  border-bottom: 8rpx solid transparent;
+  border-left: 8rpx solid #007AFF;
+}
+
+.message-user .message-text {
+  color: white;
+  word-break: break-word;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  max-width: 100%; /* 确保文本不会超出气泡 */
+  user-select: text;
+  -webkit-user-select: text;
+  line-height: 1.5;
+  font-size: 28rpx;
+  min-width: 0; /* 新增：允许文本收缩 */
+  display: inline-block; /* 新增：确保文本正确换行 */
+  word-wrap: break-word; /* 新增：确保长单词也能换行 */
+}
+
+/* 新增：用户头像容器样式优化 */
+.message-user .message-avatar {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  overflow: hidden;
+  flex-shrink: 0; /* 确保头像不会被压缩 */
+  position: relative; /* 确保定位正确 */
+  z-index: 1; /* 确保头像在最上层 */
+  margin-right: 0; /* 确保用户头像紧贴右边界 */
+}
+
+/* 输入容器 */
+.input-container {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.2);
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 统一按钮样式 */
+.image-btn,
+.call-btn,
+.send-btn {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
+}
+
+.image-btn {
+  background: linear-gradient(135deg, #00BCD4 0%, #0097A7 100%);
+}
+
+.image-btn:active {
+  background: linear-gradient(135deg, #0097A7 0%, #00695C 100%);
+  transform: scale(0.95);
+}
+
+
+.image-icon {
+  font-size: 36rpx;
+  color: white;
+  font-weight: bold;
+}
+
+
+/* 发送按钮 */
+.send-btn {
+  width: 100rpx;
+  height: 72rpx;
+  background: rgba(224, 224, 224, 0.8);
+  border-radius: 36rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  backdrop-filter: blur(5px);
+}
+
+.send-btn.send-active {
+  background: linear-gradient(135deg, #007AFF 0%, #0056CC 100%);
+  box-shadow: 0 4rpx 12rpx rgba(0, 122, 255, 0.3);
+}
+
+.send-btn:active {
+  transform: scale(0.95);
+}
+
+.send-text {
+  font-size: 28rpx;
+  color: #666;
+  font-weight: 500;
+}
+
+.send-btn.send-active .send-text {
+  color: white;
+}
+
+/* 输入框样式 */
+.message-textarea {
+  flex: 1;
+  height: 72rpx;
+  min-height: 72rpx;
+  max-height: 120rpx;
+  background: rgba(245, 245, 245, 0.8);
+  border-radius: 36rpx;
+  padding: 16rpx 24rpx;
+  font-size: 28rpx;
+  color: #333;
+  border: 1rpx solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(5px);
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+  box-sizing: border-box;
+  resize: none;
+  transition: all 0.3s ease;
+}
+
+.message-textarea.with-images {
+  border-color: rgba(102, 126, 234, 0.3);
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.message-textarea:active {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 122, 255, 0.5);
+  transform: scale(0.98);
+}
+
+/* 输入区域容器 - 固定在底部 */
+.chat-input-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  border-top: 1rpx solid rgba(255, 255, 255, 0.2);
+  padding-bottom: env(safe-area-inset-bottom);
+  /* 确保输入框固定在底部，不随键盘高度变化 */
+  transform: none;
+  transition: none;
+  width: 100vw;
+  max-width: 100vw;
+  box-sizing: border-box;
+}
+
+/* 新增：图片预览容器 */
+.image-preview-container {
+  padding: 16rpx 20rpx;
+  background: rgba(248, 249, 250, 0.95);
+  border-bottom: 1rpx solid rgba(0, 0, 0, 0.1);
+}
+
+.image-preview-scroll {
+  width: 100%;
+  white-space: nowrap;
+}
+
+.image-preview-list {
+  display: flex;
+  gap: 12rpx;
+  padding: 8rpx 0;
+}
+
+.image-preview-item {
+  position: relative;
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.remove-image-btn {
+  position: absolute;
+  top: -8rpx;
+  right: -8rpx;
+  width: 32rpx;
+  height: 32rpx;
+  background: rgba(255, 0, 0, 0.8);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20rpx;
+  font-weight: bold;
+  z-index: 10;
+}
+
+/* 适配安全区域 */
+.chat-messages {
+  padding-bottom: calc(140rpx + env(safe-area-inset-bottom));
+  height: calc(100vh - 240rpx - env(safe-area-inset-bottom)); /* 减去头部和底部的高度以及安全区域 */
+  margin-top: 100rpx; /* 为固定的顶部导航栏留出空间 */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 适配不同屏幕尺寸 */
+@media (max-width: 750rpx) {
+  .message-ai,
+  .message-user {
+    max-width: 100%;
+    width: 100%;
+  }
+  
+  .message-bubble {
+    padding: 16rpx;
+    max-width: 75vw;
+  }
+  
+  .message-text {
+    font-size: 26rpx;
+  }
+  
+  .chat-container {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .chat-header {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .chat-messages {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .chat-input-container {
+    width: 100vw;
+    max-width: 100vw;
+  }
+}
+
+/* 新增：针对不同系统的兼容性样式 */
+/* iOS系统优化 */
+@supports (-webkit-touch-callout: none) {
+  .chat-container {
+    width: 100vw;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+  
+  .chat-header {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .chat-messages {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .chat-input-container {
+    width: 100vw;
+    max-width: 100vw;
+  }
+  
+  .message-bubble {
+    word-break: break-word;
+    -webkit-word-break: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    max-width: 75vw;
+  }
+  
+  .message-text {
+    word-break: break-word;
+    -webkit-word-break: break-word;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+  }
+}
+
+/* Android系统优化 */
+@supports not (-webkit-touch-callout: none) {
+  .chat-container {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .chat-header {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .chat-messages {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .chat-input-container {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  .message-bubble {
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    max-width: 75vw;
+  }
+  
+  .message-text {
+    word-break: break-all;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+}
+
+/* 新增：确保头像在安全区域内显示 */
+.message-avatar {
+  position: relative;
+  z-index: 1;
+}
+
+/* 新增：针对小屏幕设备的优化 */
+@media (max-width: 600rpx) {
+  .message-user {
+    margin-right: 10rpx;
+    padding-right: 10rpx;
+  }
+  
+  .message-ai {
+    margin-left: 10rpx;
+    padding-left: 10rpx;
+  }
+  
+  .message-user .message-content,
+  .message-content {
+    max-width: calc(100% - 80rpx);
+  }
+  
+  .message-bubble,
+  .message-user .message-bubble {
+    max-width: 75vw; /* 小屏幕设备使用更大的最大宽度 */
+    min-width: 60rpx;
+    padding: 12rpx 16rpx;
+  }
+  
+  .message-text {
+    font-size: 26rpx;
+  }
+}
+
+/* 新增：针对超小屏幕设备的优化 */
+@media (max-width: 400rpx) {
+  .message-user .message-content,
+  .message-content {
+    max-width: calc(100% - 70rpx);
+  }
+  
+  .message-bubble,
+  .message-user .message-bubble {
+    max-width: 80vw; /* 超小屏幕设备使用更大的最大宽度 */
+    min-width: 50rpx;
+    padding: 10rpx 14rpx;
+  }
+  
+  .message-text {
+    font-size: 24rpx;
+  }
+}
+
+/* 新增：针对大屏幕设备的优化 */
+@media (min-width: 800rpx) {
+  .message-bubble,
+  .message-user .message-bubble {
+    max-width: 65vw; /* 大屏幕设备使用稍小的最大宽度，保持更好的阅读体验 */
+  }
+}
+
+/* 输入框聚焦时的样式 */
+.message-textarea:focus {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: rgba(0, 122, 255, 0.5);
+  box-shadow: 0 0 0 4rpx rgba(0, 122, 255, 0.1);
+  outline: none;
+}
+
+/* 文本选择样式 */
+.message-text::selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: inherit;
+}
+
+.message-text::-moz-selection {
+  background: rgba(0, 122, 255, 0.3);
+  color: inherit;
+}
+
+/* 输入框占位符样式 */
+.message-textarea::placeholder {
+  color: #999;
+  font-size: 28rpx;
+  line-height: 1.4;
+}
+
+/* 加载状态 */
+.loading-message {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 24rpx;
+}
+
+.loading-dots {
+  display: flex;
+  gap: 4rpx;
+}
+
+.loading-dot {
+  width: 8rpx;
+  height: 8rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.7);
+  animation: loading 1.4s infinite ease-in-out;
+}
+
+.loading-dot:nth-child(1) { animation-delay: -0.32s; }
+.loading-dot:nth-child(2) { animation-delay: -0.16s; }
+
+@keyframes loading {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+} 
+
+/* 聊天页面顶部流式传输开关样式 */
+.stream-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+  margin-left: 20rpx;
+  padding: 8rpx 12rpx;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 20rpx;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.1);
+}
+
+.stream-toggle {
+  width: 60rpx;
+  height: 32rpx;
+  border-radius: 16rpx;
+  position: relative;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.stream-disabled {
+  background: #e0e0e0;
+}
+
+.stream-enabled {
+  background: #007AFF;
+}
+
+.stream-toggle-slider {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+  background: white;
+  position: absolute;
+  top: 2rpx;
+  left: 2rpx;
+  transition: all 0.3s ease;
+  box-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+}
+
+.stream-enabled .stream-toggle-slider {
+  transform: translateX(28rpx);
+}
+
+.stream-toggle-text {
+  font-size: 24rpx;
+  color: #666;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.stream-enabled + .stream-toggle-text {
+  color: #007AFF;
+}
+
+
+/* 流式传输相关样式 */
+
+/* 流式传输中的消息指示器 */
+.streaming-indicator {
+  display: inline-block;
+  margin-left: 8rpx;
+  min-width: 40rpx; /* 设置最小宽度 */
+}
+
+.typing-dots {
+  display: flex;
+  align-items: center;
+  gap: 4rpx;
+  justify-content: center;
+}
+
+.typing-dot {
+  width: 6rpx;
+  height: 6rpx;
+  border-radius: 50%;
+  background: #007AFF;
+  animation: typing 1.4s infinite ease-in-out;
+}
+
+.typing-dot:nth-child(1) {
+  animation-delay: -0.32s;
+}
+
+.typing-dot:nth-child(2) {
+  animation-delay: -0.16s;
+}
+
+.typing-dot:nth-child(3) {
+  animation-delay: 0s;
+}
+
+@keyframes typing {
+  0%, 80%, 100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* 流式传输中的输入框禁用状态 */
+.message-textarea[disabled] {
+  opacity: 0.6;
+  background: #f5f5f5;
+}
+
+/* 流式传输中的发送按钮状态 */
+.send-btn:not(.send-active) {
+  opacity: 0.6;
+  background: #e0e0e0 !important;
+}
+
+.send-btn:not(.send-active) .send-text {
+  color: #999 !important;
+} 
+
+/* 媒体查询：确保在不同设备上的兼容性 */
+@media screen and (max-width: 750rpx) {
+  .message-content {
+    max-width: calc(100vw - 120rpx);
+  }
+  
+  .message-user .message-content {
+    max-width: calc(100vw - 120rpx);
+  }
+  
+  .message-bubble {
+    max-width: 75vw; /* 小屏幕稍微减小最大宽度 */
+  }
+  
+  .message-user .message-bubble {
+    max-width: 75vw; /* 小屏幕稍微减小最大宽度 */
+  }
+  
+  /* 小屏幕上的头像边距优化 */
+  .message-ai {
+    padding-left: 0rpx;
+    padding-right: 16rpx;
+  }
+  
+  .message-user {
+    padding-left: 16rpx;
+    padding-right: 32rpx;
+  }
+}
+
+@media screen and (min-width: 751rpx) {
+  .message-content {
+    max-width: calc(100vw - 160rpx);
+  }
+  
+  .message-user .message-content {
+    max-width: calc(100vw - 160rpx);
+  }
+  
+  .message-bubble {
+    max-width: 80vw; /* 大屏幕使用更大的最大宽度 */
+  }
+  
+  .message-user .message-bubble {
+    max-width: 80vw; /* 大屏幕使用更大的最大宽度 */
+  }
+  
+  /* 大屏幕上的头像边距优化 */
+  .message-ai {
+    padding-left: 0rpx;
+    padding-right: 24rpx;
+  }
+  
+  .message-user {
+    padding-left: 24rpx;
+    padding-right: 48rpx;
+  }
+} 
+
+/* 用户消息图片显示样式 */
+.message-user .message-images {
+  margin-bottom: 12rpx;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end; /* 图片靠右对齐 */
+}
+
+.message-user .image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8rpx;
+  border-radius: 16rpx;
+  overflow: hidden;
+  width: fit-content; /* 根据内容自适应宽度 */
+  max-width: 400rpx; /* 最大宽度限制 */
+}
+
+.message-user .image-grid.single {
+  max-width: 400rpx;
+  width: 400rpx; /* 单张图片固定宽度 */
+}
+
+.message-user .image-grid.single .message-image {
+  width: 100%;
+  max-height: 400rpx;
+  border-radius: 16rpx;
+  object-fit: cover;
+}
+
+.message-user .image-grid.double {
+  max-width: 400rpx;
+  width: 400rpx; /* 两张图片固定宽度 */
+}
+
+.message-user .image-grid.double .message-image {
+  width: calc(50% - 4rpx);
+  height: 200rpx;
+  border-radius: 12rpx;
+  object-fit: cover;
+}
+
+.message-user .image-grid.multiple {
+  max-width: 400rpx;
+  width: 400rpx; /* 多张图片固定宽度 */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列网格 */
+  gap: 8rpx;
+}
+
+.message-user .image-grid.multiple .message-image {
+  width: 100%;
+  height: 120rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+}
+
+.message-user .message-image {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  object-fit: cover;
+  display: block; /* 确保图片正确显示 */
+}
+
+.message-user .message-image:active {
+  transform: scale(0.95);
+  opacity: 0.8;
+} 
+
+/* 调试：为多张图片添加边框以便查看布局 */
+.image-grid.multiple {
+  max-width: 400rpx;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列网格 */
+  gap: 8rpx;
+  width: 100%;
+  /* 调试边框 */
+  border: 1rpx solid rgba(255, 0, 0, 0.3);
+}
+
+.image-grid.multiple .message-image {
+  width: 100%;
+  height: 120rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  display: block; /* 确保图片正确显示 */
+  /* 调试边框 */
+  border: 1rpx solid rgba(0, 255, 0, 0.3);
+}
+
+/* 用户消息中的多张图片 */
+.message-user .image-grid.multiple {
+  max-width: 400rpx;
+  width: 400rpx; /* 多张图片固定宽度 */
+  display: grid;
+  grid-template-columns: repeat(3, 1fr); /* 3列网格 */
+  gap: 8rpx;
+  /* 调试边框 */
+  border: 1rpx solid rgba(0, 0, 255, 0.3);
+}
+
+.message-user .image-grid.multiple .message-image {
+  width: 100%;
+  height: 120rpx;
+  border-radius: 8rpx;
+  object-fit: cover;
+  display: block; /* 确保图片正确显示 */
+  /* 调试边框 */
+  border: 1rpx solid rgba(255, 255, 0, 0.3);
+} 
+
+.top-avatar-container {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 30rpx;
+  overflow: hidden;
+}
+
+.top-avatar-tall {
+  height: auto;
+  object-position: top;
+}
+
+.avatar-image-tall {
+  height: auto;
+  object-position: top;
+} 
