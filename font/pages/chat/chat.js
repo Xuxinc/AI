@@ -792,6 +792,24 @@ Page({
     // 可以在这里添加加载历史消息的逻辑
   },
 
+  // 开始语音通话
+  startVoiceCall() {
+    if (!app.globalData.userInfo) {
+      wx.showToast({
+        title: '请先登录',
+        icon: 'error'
+      })
+      return
+    }
+
+    // 确保 dialogId 有值，如果没有则设为 0
+    const dialogId = this.data.dialogId || 0;
+
+    // 跳转到语音通话页面
+    wx.navigateTo({
+      url: `/pages/voice-call/voice-call?characterId=${this.data.characterId}&characterName=${this.data.characterName}&characterAvatar=${this.data.characterAvatar}&dialogId=${dialogId}`
+    })
+  },
 
   // 消息长按事件
   onMessageLongPress(e) {

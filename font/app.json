@@ -4,6 +4,7 @@
     "pages/chat/chat",
     "pages/conversations/conversations",
     "pages/profile/profile",
+    "pages/voice-call/voice-call",
     "pages/character-detail/character-detail"
   ],
   "window": {

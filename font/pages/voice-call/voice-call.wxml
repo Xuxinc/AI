@@ -1,0 +1,164 @@
+<view class="voice-call-container">
+  <!-- 背景头像 -->
+  <view class="background-avatar">
+    <image src="{{characterAvatar}}" class="bg-avatar-image" mode="aspectFill" />
+    <view class="overlay"></view>
+  </view>
+  
+  <!-- 顶部信息栏 -->
+  <view class="top-bar">
+    <!-- 左侧：返回按钮和名人信息 -->
+    <view class="left-section">
+      <!-- 自定义返回按钮 -->
+      <view class="custom-back-btn" bindtap="onCustomBackTap">
+        <text class="back-icon">‹</text>
+      </view>
+      
+      <!-- 名人信息 -->
+      <view class="character-info">
+        <view class="vc-top-avatar-container">
+          <image src="{{characterAvatar}}" class="character-avatar {{isTopAvatarTall ? 'vc-top-avatar-tall' : ''}}" mode="{{isTopAvatarTall ? 'widthFix' : 'aspectFill'}}" bindload="onTopAvatarLoad" />
+        </view>
+        <view class="character-details">
+          <text class="character-name">{{characterName}}</text>
+          <text class="call-status">{{isCalling ? '通话中' : '未连接'}}</text>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 右侧：控制按钮 -->
+    <view class="top-controls">
+      <!-- 移除显示文字按钮，移到下面 -->
+    </view>
+  </view>
+  
+  <!-- 通话时长显示 -->
+  <view class="call-duration">
+    <text class="duration-text">{{formatCallDuration(callDuration)}}</text>
+  </view>
+  
+  <!-- 消息区域（可切换显示），整体上移 -->
+  <view class="messages-wrapper {{showMessages ? 'show' : 'hide'}}" style="margin-top: -40rpx;">
+    <view class="messages-container">
+      <scroll-view class="messages-scroll" scroll-y="true" scroll-into-view="{{scrollToView}}" scroll-with-animation="true">
+        <view class="messages-list">
+          <view 
+            wx:for="{{messages}}" 
+            wx:key="id" 
+            class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}} {{item.isStreaming ? 'streaming-message' : ''}}"
+            id="msg-{{item.id}}"
+          >
+            <!-- 用户消息 -->
+            <view wx:if="{{item.role === 'user'}}" class="user-message-content">
+              <view class="message-bubble user-bubble {{item.isStreaming ? 'streaming-bubble' : ''}}" bindlongpress="onMessageLongPress" data-message="{{item.content}}" data-role="{{item.role}}" data-message-id="{{item.id}}">
+                <view class="message-header">
+                  <text class="message-role">{{item.isStreaming ? '正在识别...' : (userInfo && userInfo.nickname ? userInfo.nickname : '您')}}</text>
+                  <text class="message-time">{{item.time}}</text>
+                </view>
+                <text class="message-text">{{item.content}}</text>
+                <!-- 流式消息的动画指示器 -->
+                <view wx:if="{{item.isStreaming}}" class="streaming-indicator">
+                  <view class="streaming-dot"></view>
+                  <view class="streaming-dot"></view>
+                  <view class="streaming-dot"></view>
+                </view>
+              </view>
+              <view class="vc-msg-avatar-container">
+                <image 
+                  wx:if="{{userInfo && userInfo.avatar}}"
+                  src="{{userInfo.avatar}}"
+                  class="user-avatar-img"
+                  mode="aspectFill" />
+                <view wx:else class="user-avatar-fallback">👤</view>
+              </view>
+            </view>
+            
+            <!-- AI消息 -->
+            <view wx:else class="ai-message-content">
+              <view class="vc-msg-avatar-container">
+                <image src="{{characterAvatar}}" class="ai-avatar {{isTopAvatarTall ? 'vc-avatar-img-tall' : ''}}" mode="{{isTopAvatarTall ? 'widthFix' : 'aspectFill'}}" bindload="onAiAvatarLoad" />
+              </view>
+              <view class="message-bubble ai-bubble" bindlongpress="onMessageLongPress" data-message="{{item.content}}" data-role="{{item.role}}" data-message-id="{{item.id}}">
+                <view class="message-header">
+                  <text class="message-role">{{characterName}}</text>
+                  <text class="message-time">{{item.time}}</text>
+                </view>
+                <text class="message-text">{{item.content}}</text>
+                <!-- 语音播放按钮 -->
+                <view wx:if="{{item.voiceUrl}}" class="voice-controls">
+                  <view 
+                    class="voice-play-btn {{item.isPlaying ? 'playing' : ''}}"
+                    bindtap="playVoiceMessage"
+                    data-voice-url="{{item.voiceUrl}}"
+                    data-message-id="{{item.id}}"
+                  >
+                    <text class="play-icon">{{item.isPlaying ? '⏸️' : '🔊'}}</text>
+                    <text class="play-text">{{item.isPlaying ? '暂停' : '播放'}}</text>
+                  </view>
+                </view>
+              </view>
+            </view>
+          </view>
+          
+          <!-- 空状态提示 -->
+          <view wx:if="{{messages.length === 0}}" class="empty-messages">
+            <text class="empty-text">开始说话，{{characterName}}会回复您~</text>
+          </view>
+        </view>
+      </scroll-view>
+    </view>
+  </view>
+  
+  <!-- 通话状态指示器 -->
+  <view class="call-indicators">
+    <!-- AI思考状态 -->
+    <view wx:if="{{isThinking}}" class="thinking-indicator">
+      <view class="thinking-dots">
+        <view class="dot"></view>
+        <view class="dot"></view>
+        <view class="dot"></view>
+      </view>
+      <text class="thinking-text">{{characterName}}正在思考...</text>
+    </view>
+    
+    <!-- 播放状态 - 改为打断按钮 -->
+    <view wx:if="{{isPlaying}}" class="playing-indicator">
+      <view class="playing-waves">
+        <view class="wave"></view>
+        <view class="wave"></view>
+        <view class="wave"></view>
+        <view class="wave"></view>
+      </view>
+      <view class="playing-interrupt-btn" bindtap="interruptPlayback">
+        <text class="playing-interrupt-text">{{characterName}}正在说话，点击可打断</text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 底部控制区 -->
+  <view class="bottom-controls">
+    <!-- 正在暂停录音提示 -->
+    <view wx:if="{{isPausingRecording}}" class="pausing-recording-indicator">
+      <text class="pausing-recording-text">正在暂停录音</text>
+    </view>
+    <!-- 录音状态 -->
+    <view wx:if="{{isRecording}}" class="recording-indicator-bottom transparent">
+      <view class="recording-dot"></view>
+      <text class="recording-text">正在录音...</text>
+    </view>
+    
+    <!-- 控制按钮区域 -->
+    <view class="control-buttons">
+      <!-- 显示文字按钮 -->
+      <view class="toggle-messages-btn-bottom {{showMessages ? 'active' : ''}}" bindtap="toggleMessages">
+        <text class="btn-icon-bottom">💬</text>
+        <text class="btn-text-bottom">{{showMessages ? '隐藏文字' : '显示文字'}}</text>
+      </view>
+      
+      <!-- 结束通话按钮 -->
+      <view class="end-call-btn" bindtap="endCall">
+        <text class="end-call-text">结束通话</text>
+      </view>
+    </view>
+  </view>
+</view> 
