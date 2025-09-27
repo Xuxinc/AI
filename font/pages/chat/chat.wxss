@@ -493,6 +493,20 @@
   font-weight: bold;
 }
 
+/* 语音通话按钮 */
+.call-btn {
+  background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%);
+}
+
+.call-btn:active {
+  background: linear-gradient(135deg, #388E3C 0%, #2E7D32 100%);
+  transform: scale(0.95);
+}
+
+.call-icon {
+  font-size: 32rpx;
+  color: white;
+}
 
 /* 发送按钮 */
 .send-btn {

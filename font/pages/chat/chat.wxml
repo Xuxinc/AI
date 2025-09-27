@@ -182,6 +182,9 @@
           disabled="{{isStreaming}}"
           adjust-position="false"
         />
+          <view class="call-btn" bindtap="startVoiceCall">
+            <text class="call-icon">📞</text>
+          </view>
         <view class="send-btn {{(inputMessage || selectedImages.length > 0) && !isStreaming ? 'send-active' : ''}}" bindtap="sendMessage">
             <text class="send-text">发送</text>
         </view>
