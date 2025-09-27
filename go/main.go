@@ -4,6 +4,7 @@ import (
 	"ai-celebrity-simulator/config"
 	"ai-celebrity-simulator/database"
 	"ai-celebrity-simulator/routes"
+	"ai-celebrity-simulator/services"
 	"ai-celebrity-simulator/utils"
 	"log"
 	"os"
@@ -46,6 +47,14 @@ func main() {
 		utils.LogWarn("🔴 Redis缓存功能将不可用")
 	} else {
 		utils.LogInfo("🔴 Redis连接初始化完成")
+	}
+
+	// 初始化OSS服务
+	if err := services.InitOSSService(); err != nil {
+		utils.LogWarn("⚠️ OSS服务初始化失败: %v", err)
+		utils.LogWarn("📸 图片上传功能将不可用")
+	} else {
+		utils.LogInfo("☁️ OSS服务初始化成功")
 	}
 
 	// 设置Gin模式（通过配置控制，与日志系统保持一致）
